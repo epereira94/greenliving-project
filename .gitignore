@@ -1,0 +1,22 @@
+# ===== JAVA / MAVEN =====
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+# ===== ECLIPSE =====
+.project
+.classpath
+.settings/
+.metadata/
+
+# ===== OS FILES =====
+.DS_Store
+Thumbs.db
+
+# ===== LOGS =====
+*.log
+
+# ===== LOCAL CONFIG (optional) =====
+.env
