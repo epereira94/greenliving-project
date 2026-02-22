@@ -12,7 +12,9 @@ public class ForumDAO {
             "SELECT t.thread_id, t.title, t.created_by, t.created_at, " +
             "       (SELECT COUNT(*) FROM forum_posts p WHERE p.thread_id=t.thread_id) AS post_count " +
             "FROM forum_threads t ORDER BY t.created_at DESC, t.thread_id DESC";
+
         List<Map<String,Object>> out = new ArrayList<>();
+
         try (Connection c = DBConnection.getConnection();
              PreparedStatement ps = c.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -29,36 +31,54 @@ public class ForumDAO {
         } catch (Exception e) {
             throw new RuntimeException("listThreads failed", e);
         }
+
         return out;
     }
 
+    /**
+     * Creates a new thread + inserts the first post.
+     * IMPORTANT FIX: forum_threads has a NOT NULL 'content' column in your DB,
+     * so we insert firstPostContent into forum_threads.content too.
+     */
     public int createThread(String title, String createdBy, String firstPostContent) {
         try (Connection c = DBConnection.getConnection()) {
             c.setAutoCommit(false);
 
             int threadId;
+
+            // ✅ FIXED: include content column
             try (PreparedStatement ps = c.prepareStatement(
-                    "INSERT INTO forum_threads(title, created_by) VALUES(?,?)",
+                    "INSERT INTO forum_threads(title, created_by, content) VALUES(?,?,?)",
                     Statement.RETURN_GENERATED_KEYS)) {
+
                 ps.setString(1, title);
                 ps.setString(2, createdBy);
+                ps.setString(3, firstPostContent);
+
                 ps.executeUpdate();
+
                 try (ResultSet keys = ps.getGeneratedKeys()) {
-                    keys.next();
+                    if (!keys.next()) {
+                        throw new SQLException("Failed to retrieve generated thread_id.");
+                    }
                     threadId = keys.getInt(1);
                 }
             }
 
+            // Keep your existing behavior: also store the first post in forum_posts
             try (PreparedStatement ps2 = c.prepareStatement(
                     "INSERT INTO forum_posts(thread_id, posted_by, content) VALUES(?,?,?)")) {
+
                 ps2.setInt(1, threadId);
                 ps2.setString(2, createdBy);
                 ps2.setString(3, firstPostContent);
+
                 ps2.executeUpdate();
             }
 
             c.commit();
             return threadId;
+
         } catch (Exception e) {
             throw new RuntimeException("createThread failed", e);
         }
@@ -66,11 +86,15 @@ public class ForumDAO {
 
     public Map<String,Object> getThread(int threadId) {
         String sql = "SELECT thread_id, title, created_by, created_at FROM forum_threads WHERE thread_id=?";
+
         try (Connection c = DBConnection.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
+
             ps.setInt(1, threadId);
+
             try (ResultSet rs = ps.executeQuery()) {
                 if (!rs.next()) return null;
+
                 Map<String,Object> m = new HashMap<>();
                 m.put("threadId", rs.getInt("thread_id"));
                 m.put("title", rs.getString("title"));
@@ -78,18 +102,25 @@ public class ForumDAO {
                 m.put("createdAt", rs.getTimestamp("created_at"));
                 return m;
             }
+
         } catch (Exception e) {
             throw new RuntimeException("getThread failed", e);
         }
     }
 
     public List<Map<String,Object>> listPosts(int threadId) {
-        String sql = "SELECT post_id, posted_by, content, created_at FROM forum_posts WHERE thread_id=? ORDER BY created_at ASC, post_id ASC";
+        String sql =
+            "SELECT post_id, posted_by, content, created_at " +
+            "FROM forum_posts WHERE thread_id=? " +
+            "ORDER BY created_at ASC, post_id ASC";
+
         List<Map<String,Object>> out = new ArrayList<>();
+
         try (Connection c = DBConnection.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
 
             ps.setInt(1, threadId);
+
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Map<String,Object> m = new HashMap<>();
@@ -100,20 +131,26 @@ public class ForumDAO {
                     out.add(m);
                 }
             }
+
         } catch (Exception e) {
             throw new RuntimeException("listPosts failed", e);
         }
+
         return out;
     }
 
     public void addReply(int threadId, String postedBy, String content) {
         String sql = "INSERT INTO forum_posts(thread_id, posted_by, content) VALUES(?,?,?)";
+
         try (Connection c = DBConnection.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
+
             ps.setInt(1, threadId);
             ps.setString(2, postedBy);
             ps.setString(3, content);
+
             ps.executeUpdate();
+
         } catch (Exception e) {
             throw new RuntimeException("addReply failed", e);
         }

@@ -5,6 +5,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>GreenLiving - Tips</title>
+  <link rel="stylesheet" href="<c:url value='/assets/styles.css'/>" />
   <style>
     body { font-family: Arial, sans-serif; margin: 24px; }
     .top { margin-bottom: 16px; }
@@ -17,31 +18,34 @@
   </style>
 </head>
 <body>
+  <jsp:include page="/WEB-INF/views/_nav.jsp"/>
 
-  <div class="top">
-    <h1>Sustainable Living Tips</h1>
-    <p><a href="<c:url value='/'/>">← Back to Home</a></p>
+  <div class="container">
+    <div class="top">
+      <h1>Sustainable Living Tips</h1>
+      <p><a href="<c:url value='/'/>">← Back to Home</a></p>
 
-    <!-- ADD TIP LINK HERE -->
-    <p>
-      <a class="addBtn" href="<c:url value='/add-tip'/>">+ Add New Tip</a>
-    </p>
+      <p>
+        <a class="addBtn" href="<c:url value='/add-tip'/>">+ Add New Tip</a>
+      </p>
+    </div>
+
+    <c:choose>
+      <c:when test="${empty tips}">
+        <p>No tips found.</p>
+      </c:when>
+      <c:otherwise>
+        <c:forEach var="t" items="${tips}">
+          <div class="tip">
+            <span class="cat">${t.category}</span>
+            <h3 class="title">${t.title}</h3>
+            <p class="content">${t.content}</p>
+          </div>
+        </c:forEach>
+      </c:otherwise>
+    </c:choose>
   </div>
 
-  <c:choose>
-    <c:when test="${empty tips}">
-      <p>No tips found.</p>
-    </c:when>
-    <c:otherwise>
-      <c:forEach var="t" items="${tips}">
-        <div class="tip">
-          <span class="cat">${t.category}</span>
-          <h3 class="title">${t.title}</h3>
-          <p class="content">${t.content}</p>
-        </div>
-      </c:forEach>
-    </c:otherwise>
-  </c:choose>
-
+  <jsp:include page="/WEB-INF/views/_footer.jsp"/>
 </body>
 </html>

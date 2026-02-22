@@ -5,6 +5,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Add Tip - GreenLiving</title>
+  <link rel="stylesheet" href="<c:url value='/assets/styles.css'/>" />
   <style>
     body { font-family: Arial, sans-serif; margin: 24px; }
     .box { max-width: 640px; }
@@ -18,31 +19,35 @@
   </style>
 </head>
 <body>
+  <jsp:include page="/WEB-INF/views/_nav.jsp"/>
 
-  <div class="box">
-    <h1>Add a Sustainable Tip</h1>
-    <p><a href="<c:url value='/tips'/>">← Back to Tips</a></p>
+  <div class="container">
+    <div class="box">
+      <h1>Add a Sustainable Tip</h1>
+      <p><a href="<c:url value='/tips'/>">← Back to Tips</a></p>
 
-    <c:if test="${not empty error}">
-      <div class="error">${error}</div>
-    </c:if>
+      <c:if test="${not empty error}">
+        <div class="error">${error}</div>
+      </c:if>
 
-    <form method="post" action="<c:url value='/add-tip'/>">
-      <label for="title">Title</label>
-      <input id="title" name="title" maxlength="150" required value="${titleVal}" />
+      <form method="post" action="<c:url value='/add-tip'/>">
+        <label for="title">Title</label>
+        <input id="title" name="title" maxlength="150" required value="${titleVal}" />
 
-      <label for="category">Category</label>
-      <input id="category" name="category" maxlength="60" required value="${categoryVal}" />
+        <label for="category">Category</label>
+        <input id="category" name="category" maxlength="60" required value="${categoryVal}" />
 
-      <label for="content">Content</label>
-      <textarea id="content" name="content" required>${contentVal}</textarea>
+        <label for="content">Content</label>
+        <textarea id="content" name="content" required>${contentVal}</textarea>
 
-      <div class="actions">
-        <button type="submit">Save Tip</button>
-        <a href="<c:url value='/tips'/>">Cancel</a>
-      </div>
-    </form>
+        <div class="actions">
+          <button type="submit">Save Tip</button>
+          <a href="<c:url value='/tips'/>">Cancel</a>
+        </div>
+      </form>
+    </div>
   </div>
 
+  <jsp:include page="/WEB-INF/views/_footer.jsp"/>
 </body>
 </html>

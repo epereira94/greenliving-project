@@ -43,7 +43,6 @@ function calc(){
   const car = parseInt(document.getElementById('car').value || '0', 10);
   const flights = parseInt(document.getElementById('flights').value || '0', 10);
 
-  // simple demo factors
   const total = Math.round(kwh*0.4 + car*0.2 + flights*90);
 
   document.getElementById('resultBox').style.display = 'block';
@@ -51,5 +50,7 @@ function calc(){
     "Estimated monthly footprint: " + total + " kg CO₂";
 }
 </script>
+
+  <jsp:include page="/WEB-INF/views/_footer.jsp"/>
 </body>
 </html>

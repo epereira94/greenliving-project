@@ -5,6 +5,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>GreenLiving - Products</title>
+  <link rel="stylesheet" href="<c:url value='/assets/styles.css'/>" />
   <style>
     body { font-family: Arial, sans-serif; margin: 24px; }
     .top { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
@@ -16,33 +17,37 @@
   </style>
 </head>
 <body>
+  <jsp:include page="/WEB-INF/views/_nav.jsp"/>
 
-  <div class="top">
-    <div>
-      <h1>Eco-Friendly Products</h1>
-      <p><a href="<c:url value='/'/>">← Back to Home</a></p>
+  <div class="container">
+    <div class="top">
+      <div>
+        <h1>Eco-Friendly Products</h1>
+        <p><a href="<c:url value='/'/>">← Back to Home</a></p>
+      </div>
+      <div>
+        <a class="btn" href="<c:url value='/add-product'/>">+ Add Product</a>
+      </div>
     </div>
-    <div>
-      <a class="btn" href="<c:url value='/add-product'/>">+ Add Product</a>
-    </div>
+
+    <c:choose>
+      <c:when test="${empty products}">
+        <p>No products found.</p>
+      </c:when>
+      <c:otherwise>
+        <c:forEach var="p" items="${products}">
+          <div class="card">
+            <span class="cat">${p.category}</span>
+            <h3 style="margin:8px 0 6px;">${p.name}</h3>
+            <p class="muted" style="margin:0 0 8px;">Eco score: <b>${p.ecoScore}</b></p>
+            <p style="margin:0 0 10px;">${p.description}</p>
+            <a class="btn" href="<c:url value='/product'><c:param name='id' value='${p.productId}'/></c:url>">View details</a>
+          </div>
+        </c:forEach>
+      </c:otherwise>
+    </c:choose>
   </div>
 
-  <c:choose>
-    <c:when test="${empty products}">
-      <p>No products found.</p>
-    </c:when>
-    <c:otherwise>
-      <c:forEach var="p" items="${products}">
-        <div class="card">
-          <span class="cat">${p.category}</span>
-          <h3 style="margin:8px 0 6px;">${p.name}</h3>
-          <p class="muted" style="margin:0 0 8px;">Eco score: <b>${p.ecoScore}</b></p>
-          <p style="margin:0 0 10px;">${p.description}</p>
-          <a class="btn" href="<c:url value='/product'><c:param name='id' value='${p.productId}'/></c:url>">View details</a>
-        </div>
-      </c:forEach>
-    </c:otherwise>
-  </c:choose>
-
+  <jsp:include page="/WEB-INF/views/_footer.jsp"/>
 </body>
 </html>
