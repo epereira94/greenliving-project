@@ -42,6 +42,10 @@ public class ProductDetailsServlet extends HttpServlet {
 
             List<Review> reviews = reviewDAO.findByProductId(id);
 
+            ReviewDAO.RatingSummary summary = reviewDAO.getRatingSummary(id);
+            req.setAttribute("ratingAvg", summary.getAverage());
+            req.setAttribute("ratingCount", summary.getCount());
+
             req.setAttribute("product", product);
             req.setAttribute("reviews", reviews);
 

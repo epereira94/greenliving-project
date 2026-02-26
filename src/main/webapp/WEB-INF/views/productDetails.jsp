@@ -7,15 +7,9 @@
   <title>Product Details</title>
   <link rel="stylesheet" href="<c:url value='/assets/styles.css'/>" />
   <style>
-    body { font-family: Arial, sans-serif; margin: 24px; }
-    .card { border:1px solid #ddd; border-radius:10px; padding:14px; margin-bottom:12px; max-width: 860px; }
-    .cat { font-size:12px; padding:2px 8px; border:1px solid #aaa; border-radius:999px; display:inline-block; }
-    label { display:block; margin-top:10px; font-weight:bold; }
-    input, textarea, select { width: 100%; max-width: 860px; padding: 10px; margin-top: 6px; border: 1px solid #ccc; border-radius: 8px; }
-    textarea { height: 90px; }
-    .btn { padding: 10px 14px; border:1px solid #111; border-radius: 8px; cursor:pointer; background:#fff; }
-    .review { border-top:1px solid #eee; padding-top:10px; margin-top:10px; }
-    .muted { color:#666; }
+    .stars { font-size: 16px; letter-spacing: 1px; }
+    .stars .on { color: #f4b400; }
+    .stars .off { color: #cfcfcf; }
   </style>
 </head>
 <body>
@@ -25,17 +19,53 @@
     <p><a href="<c:url value='/products'/>">← Back to Products</a></p>
 
     <div class="card">
-      <span class="cat">${product.category}</span>
-      <h1 style="margin:8px 0 6px;">${product.name}</h1>
-      <p class="muted" style="margin:0 0 8px;">Eco score: <b>${product.ecoScore}</b></p>
-      <p style="margin:0 0 8px;">${product.description}</p>
+      <span class="badge">${product.category}</span>
+      <h1 style="margin:10px 0 6px;">${product.name}</h1>
+
+      <div class="small" style="margin:0 0 6px;">
+        Eco score: <b>${product.ecoScore}</b>
+      </div>
+
+      <!-- Average rating with stars -->
+      <div class="small" style="margin:0 0 10px;">
+        Rating:
+        <c:choose>
+          <c:when test="${ratingCount == 0}">
+            No ratings yet
+          </c:when>
+          <c:otherwise>
+            <c:set var="rounded" value="${ratingAvg + 0.5}" />
+            <c:set var="stars" value="${rounded - (rounded % 1)}" />
+
+            <span class="stars" aria-label="Rating">
+              <c:forEach begin="1" end="5" var="i">
+                <c:choose>
+                  <c:when test="${i <= stars}">
+                    <span class="on">★</span>
+                  </c:when>
+                  <c:otherwise>
+                    <span class="off">☆</span>
+                  </c:otherwise>
+                </c:choose>
+              </c:forEach>
+            </span>
+            <span> (${ratingCount})</span>
+          </c:otherwise>
+        </c:choose>
+      </div>
+
+      <div class="hr"></div>
+
+      <div style="margin:0 0 10px;">${product.description}</div>
 
       <c:if test="${not empty product.price}">
-        <p class="muted" style="margin:0 0 8px;">Price: <b>$${product.price}</b></p>
+        <div class="small" style="margin:0 0 10px;">Price: <b>$${product.price}</b></div>
       </c:if>
 
       <c:if test="${not empty product.productUrl}">
-        <p style="margin:0;"><a class="btn" href="${product.productUrl}" target="_blank">Open product link</a></p>
+        <p style="margin:0;">
+          <a class="btn" href="${product.productUrl}" target="_blank">Open product link</a>
+        </p>
       </c:if>
     </div>
 
@@ -48,7 +78,7 @@
         </c:when>
         <c:otherwise>
           <c:forEach var="r" items="${reviews}">
-            <div class="review">
+            <div style="border-top:1px solid #eee; padding-top:10px; margin-top:10px;">
               <p style="margin:0;"><b>${r.reviewerName}</b> — Rating: <b>${r.rating}/5</b></p>
               <p style="margin:6px 0 0;">${r.comment}</p>
             </div>
